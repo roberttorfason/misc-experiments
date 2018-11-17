@@ -1,0 +1,2 @@
+Temporal ensembling: https://arxiv.org/abs/1610.02242
+Mean teacher: https://arxiv.org/abs/1703.01780
