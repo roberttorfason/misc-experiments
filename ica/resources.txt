@@ -1,0 +1,4 @@
+https://stats.stackexchange.com/questions/173163/linear-transformation-of-gaussian-random-variable
+https://www.cs.helsinki.fi/u/ahyvarin/papers/NN00new.pdf
+https://danieltakeshi.github.io/2015/01/03/independent-component-analysis-a-gentle-introduction/
+http://cs229.stanford.edu/notes/cs229-notes11.pdf
