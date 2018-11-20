@@ -2,3 +2,6 @@ https://stats.stackexchange.com/questions/173163/linear-transformation-of-gaussi
 https://www.cs.helsinki.fi/u/ahyvarin/papers/NN00new.pdf
 https://danieltakeshi.github.io/2015/01/03/independent-component-analysis-a-gentle-introduction/
 http://cs229.stanford.edu/notes/cs229-notes11.pdf
+https://www.mv.helsinki.fi/amoaning/movies/uml/ica_handout3.pdf
+http://www.sci.utah.edu/~shireen/pdfs/tutorials/Elhabian_ICA09.pdf
+https://www.cs.helsinki.fi/u/ahyvarin/papers/bookfinal_ICA.pdf
