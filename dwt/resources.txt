@@ -1,0 +1,4 @@
+http://www.phon.ox.ac.uk/jcoleman/old_SLP/Lecture_5/DTW_explanation.html
+https://en.wikipedia.org/wiki/Dynamic_time_warping
+http://www.maths.manchester.ac.uk/~mbbx2se2/Docs/Dynamic_time_warping(Steven_Elsworth).pdf
+http://web.science.mq.edu.au/~cassidy/comp449/html/ch11s02.html
