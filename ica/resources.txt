@@ -5,3 +5,5 @@ http://cs229.stanford.edu/notes/cs229-notes11.pdf
 https://www.mv.helsinki.fi/amoaning/movies/uml/ica_handout3.pdf
 http://www.sci.utah.edu/~shireen/pdfs/tutorials/Elhabian_ICA09.pdf
 https://www.cs.helsinki.fi/u/ahyvarin/papers/bookfinal_ICA.pdf
+
+https://arxiv.org/pdf/1410.8516.pdf
