@@ -40,6 +40,23 @@ def generate_data():
     return torch.from_numpy(np.expand_dims(x, -1)), torch.from_numpy(np.expand_dims(y, -1))
 
 
+def get_mean_state_dict(state_dicts):
+    base_keys = set(state_dicts[0].keys())
+    assert all([base_keys == set(state_dict.keys()) for state_dict in state_dicts]), 'Expected all state dictionaries' \
+                                                                                     ' to have the same keys.'
+
+    result = {k: torch.zeros_like(v) for k, v in state_dicts[0].items()}
+
+    for state_dict in state_dicts:
+        for k, v in state_dict.items():
+            result[k].add_(v)
+
+    for k in result:
+        result[k].div_(len(state_dicts))
+
+    return result
+
+
 def main():
     x, y = generate_data()
 
@@ -79,6 +96,8 @@ def main():
             net_states.append(copy.deepcopy(net.state_dict()))
 
     net.eval()
+    net_states_mean = get_mean_state_dict(net_states)
+    net.load_state_dict(net_states_mean)
 
     for net_state in net_states:
         net.load_state_dict(net_state)
