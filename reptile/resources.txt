@@ -1,0 +1,2 @@
+Model agnostic meta learning: https://arxiv.org/pdf/1703.03400.pdf
+Reptile: https://d4mucfpksywv.cloudfront.net/research-covers/reptile/reptile_update.pdf
