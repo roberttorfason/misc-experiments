@@ -40,21 +40,46 @@ def generate_data():
     return torch.from_numpy(np.expand_dims(x, -1)), torch.from_numpy(np.expand_dims(y, -1))
 
 
-def get_mean_state_dict(state_dicts):
+def assert_matching_keys(state_dicts):
     base_keys = set(state_dicts[0].keys())
     assert all([base_keys == set(state_dict.keys()) for state_dict in state_dicts]), 'Expected all state dictionaries' \
-                                                                                     ' to have the same keys.'
+                                                                                     ' to have matching keys.'
 
+
+def get_diff_state_dicts(state_dict0, state_dict1):
+    assert_matching_keys([state_dict0, state_dict1])
+    result = copy.deepcopy(state_dict1)
+    for k in result:
+        result[k].subtract_(state_dict0[k])
+
+    return result
+
+
+def get_sum_state_dicts(state_dicts):
+    assert_matching_keys(state_dicts)
     result = {k: torch.zeros_like(v) for k, v in state_dicts[0].items()}
 
     for state_dict in state_dicts:
         for k, v in state_dict.items():
             result[k].add_(v)
 
+    return result
+
+
+def get_mean_state_dicts(state_dicts):
+    result = get_sum_state_dicts(state_dicts)
+
     for k in result:
         result[k].div_(len(state_dicts))
 
     return result
+
+
+def plot_predictions_and_gt(x, y, net):
+    with torch.no_grad():
+        plt.plot(x.data.numpy(), net(x).data.numpy(), 'r')
+        plt.plot(x.data.numpy(), y.data.numpy())
+        plt.show()
 
 
 def main():
@@ -75,7 +100,7 @@ def main():
 
     net_states = []
     net.train()
-    for epoch in range(40):
+    for epoch in range(400):
         # scheduler.step()
         loss_avg = 0.0
         counter = 0
@@ -91,19 +116,20 @@ def main():
             optimizer.step()
             counter += 1
 
-        if epoch % 10 == 0:
+        if epoch % 100 == 0:
             print(loss_avg / counter)
             net_states.append(copy.deepcopy(net.state_dict()))
 
+    # TODO(robert): Chech if grad is calculated after eval, or it with torch.no_grad is needed
     net.eval()
-    net_states_mean = get_mean_state_dict(net_states)
+    # TODO(robert): It's probably simpler to not use the state dict, since the
+    #   ultimate weight update will be on the form: W.data.sub_(eta*W.grad.data)
+    net_states_mean = get_mean_state_dicts(net_states)
     net.load_state_dict(net_states_mean)
 
     for net_state in net_states:
         net.load_state_dict(net_state)
-        plt.plot(x.data.numpy(), net(x).data.numpy(), 'r')
-        plt.plot(x.data.numpy(), y.data.numpy())
-        plt.show()
+        plot_predictions_and_gt(x, y, net)
 
 
 if __name__ == '__main__':
