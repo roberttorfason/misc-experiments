@@ -1,2 +1,6 @@
 Model agnostic meta learning: https://arxiv.org/pdf/1703.03400.pdf
 Reptile: https://d4mucfpksywv.cloudfront.net/research-covers/reptile/reptile_update.pdf
+
+PyTorch specific things about keeping separate variables:
+- https://discuss.pytorch.org/t/what-is-the-recommended-way-to-re-assign-update-values-in-a-variable-or-tensor/6125
+- https://discuss.pytorch.org/t/how-does-one-make-sure-that-the-parameters-are-update-manually-in-pytorch-using-modules/6076
