@@ -1,15 +1,12 @@
-import logging
-
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import scipy
-import sklearn
-from torch import nn
-import torch.nn.functional as F
 import torch
+import torch.nn.functional as F
 import torch.utils.data
+from torch import nn
+
+
+k = 1 / (2 * np.pi)
 
 
 def _init_weights(m):
@@ -17,38 +14,48 @@ def _init_weights(m):
         nn.init.xavier_normal_(m.weight)
 
 
+def gaussian_1d(value, u, sigma):
+    return k / sigma * torch.exp(-(u - value)**2 / (2 * sigma))
+
+
 class FcNetwork(nn.Module):
-    def __init__(self, input_size, dropout_probability):
-        # TODO(robert): Get the basic network to train!
-        #               probably wrong intialization for tanh
-        # TODO(robert): Try with different activation functions
-        num_outputs = 9
+    def __init__(self, input_size, num_mixtures):
         super(FcNetwork, self).__init__()
         self._linear0 = nn.Linear(input_size, 20)
-        self._linear1 = nn.Linear(20, num_outputs)
 
-        self._mixture_soft = nn.Softmax()
+        self._alphas = nn.Linear(20, num_mixtures)
+        self._means = nn.Linear(20, num_mixtures)
+        self._sigmas = nn.Linear(20, num_mixtures)
+
+        # self._activation = nn.ReLU()
+        self._activation = nn.Tanh()
 
         self.apply(_init_weights)
 
     def forward(self, x):
         out = self._linear0(x)
-        out = torch.tanh(out)
-        out = self._linear1(out)
+        out = self._activation(out)
+        alphas = self._alphas(out)
+        means = self._means(out)
+        sigmas = self._sigmas(out)
 
-        mixture = self._mixture_soft(out[0:3])
-        mean = out[3:6]
-        var = torch.exp(out[6:9])
+        # num_modes = 3
+        alphas = F.softmax(alphas, dim=-1)
+        means = means
+        sigmas = torch.exp(sigmas)
 
-        return out
+        # TODO(robert): This does not belong here
+        val0 = gaussian_1d(x, means[:, 0:1], sigmas[:, 0:1])
+
+        return val0
 
 
 def _generate_data(invert=False):
     amplitude = 0.3
-    freq = 1.0
-    t = np.arange(start=0, stop=1, step=0.001, dtype=np.float32)
+    freq = 1
+    t = np.linspace(0.0, 1.0, num=1000)
+
     y = amplitude * np.sin(2 * np.pi * freq * t)
-    # drift = 0.2 * t
     drift = 1.0 * t
     sequence_len = t.shape[0]
 
@@ -69,19 +76,22 @@ def main():
     t, y = _generate_data(invert=True)
 
     plt.scatter(t, y)
+    plt.plot(t, y)
     plt.show()
 
-    net = FcNetwork(input_size=1, dropout_probability=0.1)
+    net = FcNetwork(input_size=1)
+    input_test = torch.from_numpy(np.array([[0.5], [0.1]], dtype=np.float32))
+    result = net(input_test)
 
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.0005)
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=6000, gamma=0.2)
 
     train = torch.utils.data.TensorDataset(torch.from_numpy(t), torch.from_numpy(y))
     train_loader = torch.utils.data.DataLoader(train, batch_size=8, shuffle=True)
 
     net.train()
-    for epoch in range(400):
+    for epoch in range(4000):
         # scheduler.step()
         loss_avg = 0.0
         counter = 0
@@ -100,7 +110,7 @@ def main():
         if epoch % 200 == 0:
             print(loss_avg / counter)
 
-    t_extended = np.arange(start=-1, stop=2, step=0.01, dtype=np.float32)
+    t_extended = np.arange(start=-2, stop=2, step=0.01, dtype=np.float32)
     t_extended = np.expand_dims(t_extended, -1)
     net.eval()
     plt.scatter(t, y)
@@ -114,15 +124,11 @@ def main():
     for i in range(num_samples):
         output_samples[:, i] = net(torch.from_numpy(t_extended)).data.numpy().ravel()
 
+    net.eval_without_dropout()
     plt.scatter(t, y)
-    # plt.scatter(t_extended, output_samples, 'r')
-    plt.plot(t_extended, output_samples)
+    plt.plot(t_extended, net(torch.from_numpy(t_extended)).data.numpy(), 'r')
     plt.show()
 
-    # net.eval_with_dropout()
-    # plt.scatter(t, y)
-    # plt.plot(t_extended, net(torch.from_numpy(t_extended)).data.numpy(), 'r')
-    # plt.show()
 
 
 if __name__ == '__main__':
