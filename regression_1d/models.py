@@ -14,9 +14,9 @@ def _init_weights(m):
 class FcNetwork(nn.Module):
     def __init__(self, input_size, activation=nn.ReLU):
         super().__init__()
-        self._linear0 = nn.Linear(input_size, 20)
-        self._mean = nn.Linear(20, 1)
-        self._beta = nn.Linear(20, 1, bias=False)
+        self._linear0 = nn.Linear(input_size, 100)
+        self._mean = nn.Linear(100, 1)
+        self._beta = nn.Linear(100, 1)
 
         self._activation = activation()
 

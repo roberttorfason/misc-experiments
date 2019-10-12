@@ -23,3 +23,16 @@ def generate_data(invert=False):
     return np.expand_dims(t, -1), np.expand_dims(y_hat, -1)
 
 
+def generate_heteroscedastic_line():
+    t = np.linspace(0.0, 5.0, num=1000)
+    drift = -1.0 * t
+
+    noise = np.r_[
+        0.01 * np.random.standard_normal((200,)),
+        0.40 * np.random.standard_normal((400,)),
+        0.10 * np.random.standard_normal((400,)),
+    ]
+
+    y_hat = 1 + drift + noise
+
+    return np.expand_dims(t, -1).astype(np.float32), np.expand_dims(y_hat, -1).astype(np.float32)
