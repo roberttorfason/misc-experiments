@@ -6,48 +6,8 @@ import torch.utils.data
 from torch import nn
 
 
-k = 1 / (2 * np.pi)
-
-
-def _init_weights(m):
-    if isinstance(m, nn.Linear):
-        nn.init.xavier_normal_(m.weight)
-
-
-def gaussian_1d(value, u, sigma):
-    return k / sigma * torch.exp(-(u - value)**2 / (2 * sigma))
-
-
-class FcNetwork(nn.Module):
-    def __init__(self, input_size, num_mixtures):
-        super(FcNetwork, self).__init__()
-        self._linear0 = nn.Linear(input_size, 20)
-
-        self._alphas = nn.Linear(20, num_mixtures)
-        self._means = nn.Linear(20, num_mixtures)
-        self._sigmas = nn.Linear(20, num_mixtures)
-
-        # self._activation = nn.ReLU()
-        self._activation = nn.Tanh()
-
-        self.apply(_init_weights)
-
-    def forward(self, x):
-        out = self._linear0(x)
-        out = self._activation(out)
-        alphas = self._alphas(out)
-        means = self._means(out)
-        sigmas = self._sigmas(out)
-
-        # num_modes = 3
-        alphas = F.softmax(alphas, dim=-1)
-        means = means
-        sigmas = torch.exp(sigmas)
-
-        # TODO(robert): This does not belong here
-        val0 = gaussian_1d(x, means[:, 0:1], sigmas[:, 0:1])
-
-        return val0
+def gaussian_1d(value, u, beta):
+    return 1 / (2 * np.pi) * beta * torch.exp(-beta**2 * (u - value)**2 / 2)
 
 
 def _generate_data(invert=False):
