@@ -16,7 +16,7 @@ class FcNetwork(nn.Module):
         super().__init__()
         self._linear0 = nn.Linear(input_size, 20)
         self._mean = nn.Linear(20, 1)
-        self._beta = nn.Linear(20, 1)
+        self._beta = nn.Linear(20, 1, bias=False)
 
         self._activation = activation()
 
