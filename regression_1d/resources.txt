@@ -1,0 +1,1 @@
+https://github.com/ctgk/PRML/blob/master/notebooks/ch05_Neural_Networks.ipynb
